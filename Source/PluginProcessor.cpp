@@ -187,8 +187,8 @@ bool MyFilterAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* MyFilterAudioProcessor::createEditor()
 {
-    //return new MyFilterAudioProcessorEditor (*this);
-    return new juce::GenericAudioProcessorEditor(*this);
+    return new MyFilterAudioProcessorEditor (*this);
+    //return new juce::GenericAudioProcessorEditor(*this);
 }
 
 //==============================================================================
