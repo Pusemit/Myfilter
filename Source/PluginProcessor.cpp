@@ -96,9 +96,6 @@ void MyFilterAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-
-    auto& highCut = LeftChain.get<0>();
-    highCut.coefficients = juce::dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, 2000.0f);
 }
 
 void MyFilterAudioProcessor::releaseResources()
@@ -161,11 +158,11 @@ void MyFilterAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
         // ..do something to the data...
     }
 
-    float highCutFreq = apvts.getRawParameterValue("LowCut Freq")->load();
+    float lowCutFreq = apvts.getRawParameterValue("LowCut Freq")->load();
     // 设置滤波器的参数
 
-    LeftChain.get<0>().coefficients = juce::dsp::IIR::Coefficients<float>::makeHighPass(getSampleRate(), highCutFreq);
-    RightChain.get<0>().coefficients = juce::dsp::IIR::Coefficients<float>::makeHighPass(getSampleRate(), highCutFreq);
+    LeftChain.get<0>().coefficients = juce::dsp::IIR::Coefficients<float>::makeHighPass(getSampleRate(), lowCutFreq);
+    RightChain.get<0>().coefficients = juce::dsp::IIR::Coefficients<float>::makeHighPass(getSampleRate(), lowCutFreq);
 
     juce::dsp::AudioBlock<float> block(buffer);
     auto leftBlock = block.getSingleChannelBlock(0);
