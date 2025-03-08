@@ -94,11 +94,30 @@ void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&);
 juce::AudioProcessorEditor* createEditor()；
 ```
 
+要控制插件，首先要定义好我们的参数，在JUCE中，往往用`AudioProcessorValueTreeState`(简称apvts)对象来装载参数
+ 
+ 实例化一个apvts参数必须要传入4个形参，其中第四个形参需要传入一个`AudioProcessorValueTreeState::ParameterLayout`实例
+
+ 在创建layout实例的时候用.add方法添加参数就可以为最终的apvts中也就会有对应参数了，具体实现如下：
+
+```cpp
+    //在PluginProcessor.h中实例化apvts
+	//声明createParameterLayout()，返回值是ParameterLayout的对象
+	static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+	//初始化一个AudioProcessorValueTreeState对象
+    juce::AudioProcessorValueTreeState apvts{
+		*this,//这个APTVS使用的AudioProcessor
+		nullptr,//设置undoManager
+		"Parameter",//设置parameterID
+		createParameterLayout() //设置parameterLayout
+    };
+```
+
 ```cpp
 //在PluginProcessor.cpp中实现方法
 juce::AudioProcessorValueTreeState::ParameterLayout MyFilterAudioProcessor::createParameterLayout()
 {
-    //添加一个有一个参数"LowCut Freq"的Layout
+    //添加有一个参数"LowCut Freq"的Layout
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         "LowCut Freq",//参数ID
@@ -110,7 +129,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout MyFilterAudioProcessor::crea
 }
 ```
 
-现在已经有了控制插件的参数，此外还必须要有`juce::dsp::ProcessorChain`对象添加一些效果处理
+现在已经有了控制插件的参数，此外我们还需要`juce::dsp::ProcessorChain`对象添加一些效果处理
 
 值得一提的是`juce::dsp::ProcessorChain`对象是可以嵌套的，也就是说一条链中也可以加入其他含有效果的链，而这里只简单地添加了一个`juce::dsp::IIR::Filter<float>`
 
@@ -136,7 +155,7 @@ juce::AudioProcessorEditor* MyFilterAudioProcessor::createEditor()
     return new juce::GenericAudioProcessorEditor(*this);
 }
 ```
-来到`processBlock`方法下，这里是音频处理的核心方法，在创建工程时已经有了几句代码，解释如下：
+来到`processBlock`方法下，这里是音频处理的核心方法，在创建工程时已经有了几句代码，官方也在这里贴心地给了注释，解释如下：
 
 ```cpp
 //禁用浮点数的非规格化处理，提高处理效率
@@ -151,7 +170,7 @@ for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
 for (int channel = 0; channel < totalNumInputChannels; ++channel)
 {
     auto* channelData = buffer.getWritePointer (channel);
-    //这里可以处理每次循环中获取的数据块，在这里可以写相关处理函数
+    //在这里可以写相关处理函数
 }
 ```
 这个方法在每次获取音频数据块的时候调用，而这个音频数据块可以理解为音频处理中的“一帧”，如果块越小，延迟越小，CPU的负载越大；块越大则反之
@@ -160,7 +179,7 @@ Bitwig中在下图选项中设置数据块大小，其他DAW中也会有相似�
 
 ![设置数据块](./Image/AudioBlock.png)
 
-虽然在以上代码中已经提供了可以处理的数据块，但是由于我们要实现的是一个Filter，根据我们小学二年级学过的DSP，‌IIR滤波器的结果不仅与当前的输入信号有关，还与过去的输入和输出信号有关
+虽然在以上代码中已经提供了可以处理的数据块，但是由于我们要实现的是一个Filter，根据我们小学二年级就学过的DSP知识，IIR滤波器的结果不仅与当前的输入信号有关，还与过去的输入和输出信号有关
 
 这里获取的数据块是当前音频处理的单个离散采样块，所以这对一个滤波器来说是肯定不够的，不过好在JUCE已经对我们提供了名为`juce::dsp::ProcessContextReplacing`的类，用于获取上下文的输入信息
 
@@ -194,6 +213,8 @@ RightChain.process(rightContext);
 
 不出意外的话滑块已经能实时控制这个低切滤波器的截止频率，而宿主可以读取到这个插件中的参数，你可以像对其它插件一样对这个Filter设计自动化
 
-不过现在这个Filter还很简陋，只有一个截止频率参数，你也可以用各种JUCEAPI设计高低切的坡度（Slope），多设计几个频点，以及设计波表图和滤波曲线
+不过现在这个Filter还很简陋，只有一个截止频率参数，你也可以用各种JUCE API设计高低切的坡度（Slope），多设计几个频点，设计波表图和滤波曲线等等
 
 如果JUCE原本的库不能满足你的需要，甚至你可以编写自己的库，去拓展更多功能！
+
+[更多官方教程](https://juce.com/learn/tutorials/)
