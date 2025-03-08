@@ -11,45 +11,45 @@
 
 在官网上下载Projucer，这是一个免安装的软件，解压到常用路径就可以了
 
-![Projucer的下载](Image\DownloadProjucer.png)
+![Projucer的下载](./Image/DownloadProjucer.png)
 
 打开可执行文件会弹出一个创建新工程的窗口，这里可以创建多种JUCE工程，既有独立运行的应用，也有各种格式的插件
 
-![新建页面](Image\NewProject.png)
+![新建页面](./Image/NewProject.png)
 
 我们就以常用的VST3插件为例，不要忘记勾选juce_dsp的module，一会会用到
 
-![创建VST](Image\CreateVST.png)
+![创建VST](./Image/CreateVST.png)
 
 值得一提的是，Projucer也有管理解决方案文件的功能，所以一切有关文件层级的修改建议在Projucer中进行，否则可能会导致修改被覆盖  
 
 例如这里我们可以在Projucer中添加额外的module，包括JUCE官方的module和用户自定义的module
 
-![修改文件](Image\ModifyFile.png)
+![修改文件](./Image/ModifyFile.png)
 
 点击File选项卡下点击“Save Project and Open in IDE”
 
 这样会自动唤起VS，可以看到解决方案资源管理器下已经有多个工程，分别是共享代码库，Standalone工程，VST3工程，以及VST3的清单文件
 
-![资源管理器](Image\SolutionAndProject.png)
+![资源管理器](./Image/SolutionAndProject.png)
 
 按F5运行，默认JUCE的构建设置是Standalone，Standalone会构建并执行一个能够独立运行的exe，能够方便地查看UI界面（生成文件也能在构建设置中修改）
 
 但是由于这样并不能直观表现音频插件的DSP处理效果，所以我们还需要将插件插入别的程序中，
 
-![默认生成的界面](Image\DefaultEditor.png)
+![默认生成的界面](./Image/DefaultEditor.png)
 
 右键VST的工程并生成，会在Bulid中的对应位置生成VST插件，这个插件就可以挂载在外部软件中了
 
-![构建VST](Image\BuildVST.png)
+![构建VST](./Image/BuildVST.png)
 
 下图是JUCE的案例工程中自带一个轻量化的主机，可以识别并插入插件，也可以通过修改启动项来在我们的工程构建的过程中自动打开，
 
-![JUCE的主机工程案例](Image\JUCEHost.png)
+![JUCE的主机工程案例](./Image/JUCEHost.png)
 
 为了直观起见，这里选择直接挂载在宿主上，这里用的是Bitwig。
 
-![挂载在Bitwig上](Image\BitwigPlugin.png)
+![挂载在Bitwig上](./Image/BitwigPlugin.png)
 
 可以看到现在空白的VST插件可以正常挂载，默认的Editor上会有一个HelloWorld文本
 
@@ -61,7 +61,7 @@ Bitwig的优势是即使在我们开发过程中插件崩溃，也不会影响�
 
 回到我们的SharedCode，这里有外部依赖，以及一些需要用到的Module，这些Module目前都是JUCE帮我们配置的，后面也能自定义一些自己的Module
 
-![工程的Module](Image\JUCEModules.png)
+![工程的Module](./Image/JUCEModules.png)
 
 主要的功能脚本都在工程名下的Source文件夹下，这里已经有4个文件，分别是PluginEditor和PluginProcessor以及各自的.cpp和.h文件
 
@@ -69,7 +69,7 @@ Bitwig的优势是即使在我们开发过程中插件崩溃，也不会影响�
 
 PluginEditor主要负责插件页面的设计以及UI交互功能，而PluginProcessor主要负责插件内部的逻辑，对于音频或者midi数据块的处理
 
-![Source文件夹](Image\ProjectSource.png)
+![Source文件夹](./Image/ProjectSource.png)
 
 当然想要创建更多脚本来管理也是可以的，别忘在Projucer中配置好
 
@@ -158,7 +158,7 @@ for (int channel = 0; channel < totalNumInputChannels; ++channel)
 
 Bitwig中在下图选项中设置数据块大小，其他DAW中也会有相似的选项：
 
-![设置数据块](Image\AudioBlock.png)
+![设置数据块](./Image/AudioBlock.png)
 
 虽然在以上代码中已经提供了可以处理的数据块，但是由于我们要实现的是一个Filter，根据我们小学二年级学过的DSP，‌IIR滤波器的结果不仅与当前的输入信号有关，还与过去的输入和输出信号有关
 
@@ -190,7 +190,7 @@ RightChain.process(rightContext);
 
 现在重新生成VST插件，在宿主中挂载，听听效果
 
-![大功告成](Image\MyFilter.png)
+![大功告成](./Image/MyFilter.png)
 
 不出意外的话滑块已经能实时控制这个低切滤波器的截止频率，而宿主可以读取到这个插件中的参数，你可以像对其它插件一样对这个Filter设计自动化
 
